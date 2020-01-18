@@ -1,0 +1,33 @@
+{
+  "name": "tri-tri",
+  "version": "1.0.0",
+  "description": "Coding a 3D engine from scratch",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GasparErrobidart/Tri-Tri.git"
+  },
+  "keywords": [
+    "3D",
+    "engine",
+    "from",
+    "scratch",
+    "coding",
+    "bare"
+  ],
+  "author": "Gaspar G. Errobidart",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GasparErrobidart/Tri-Tri/issues"
+  },
+  "homepage": "https://github.com/GasparErrobidart/Tri-Tri#readme",
+  "dependencies": {
+    "mathjs": "^6.5.0"
+  }
+}
