@@ -57,6 +57,8 @@ class Vector4{
   divide(k : Number) : Vector4{
     if(k != 0){
     	return new Vector4( this.x / k, this.y / k, this.z / k);
+    }else{
+      return new Vector4( this.x , this.y , this.z );
     }
   }
 

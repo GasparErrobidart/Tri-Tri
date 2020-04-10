@@ -10,7 +10,6 @@ import {
   TranslationMatrix
 } from '../index'
 
-import MultiplyMatrixVector from '../helpers/MultiplyMatrixVector'
 
 
 window.addEventListener("keydown",function(evt){
@@ -35,13 +34,14 @@ window.addEventListener("keydown",function(evt){
 })
 
 
-let cube : Cube = new Cube({size : 1.0})
+let mainObject : Mesh = new Cube({size : 1.0})
 
 function loadNewObject(data : any){
   const lines    = data.split("\n")
   const vertices : any[] = lines
     .filter( (l : any )=> /^v/i.test(l) )
-    .map( (l : any) => l.replace(/^v\s/i,'').split(' '))
+    .map( (l : any) => l.replace(/^v\s/i,'').split(' ') .map( (v : any) => parseFloat(v)) )
+
   let triangles = lines
     .filter(( l : any) => /^f/i.test(l) )
     .map( (l : any) => l.replace(/^f\s/i,'').split(' '))
@@ -52,7 +52,9 @@ function loadNewObject(data : any){
     return new Triangle({ vertices : v })
   })
 
-  cube = new Mesh({ triangles })
+  mainObject = new Mesh({ triangles })
+
+  console.log("Result:",mainObject)
 
 
 }
@@ -69,8 +71,6 @@ function handleFileSelect(evt : any) {
 
 document.getElementById('model-file').addEventListener('change', handleFileSelect, false);
 
-(function(window){
-  window.addEventListener('load',function(){
 
     const globalLight = new Vector4()
     globalLight.z     = -1.0
@@ -92,9 +92,9 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
     let theta     = 0
 
     screen.canvas.strokeStyle = "blue";
-    screen.add(cube)
+    // screen.add(mainObject)
 
-    function rotateCube(timestamp){
+    window.rotateCube = function(timestamp){
       // console.log("Rotating cube")
 
       screen.fill("black")
@@ -116,7 +116,7 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
 
 
 
-      let trianglesToRaster = cube.triangles.map( triangle => {
+      let trianglesToRaster = mainObject.triangles.map( triangle => {
 
 
 
@@ -138,24 +138,19 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
 
 
     		// Get lines either side of triangle
-    		let line1 = transformedTriangle.vertices[1].substract(transformedTriangle.vertices[0])
-    		let line2 = transformedTriangle.vertices[2].substract(transformedTriangle.vertices[0])
+    		const line1 = transformedTriangle.vertices[1].substract(transformedTriangle.vertices[0])
+    		const line2 = transformedTriangle.vertices[2].substract(transformedTriangle.vertices[0])
 
     		// Take cross product of lines to get normal to triangle surface
-    		let normal = line1.crossProduct(line2).normalised()
+    		const normal = line1.crossProduct(line2).normalised()
+
+        const cameraRay = transformedTriangle.vertices[0].substract(screen.camera);
 
 
-        if(
-          normal.x * (transformedTriangle.vertices[0].x - screen.camera.x) +
-          normal.y * (transformedTriangle.vertices[0].y - screen.camera.y) +
-          normal.z * (transformedTriangle.vertices[0].z - screen.camera.z)
-          < 0
-        ){
 
-          const luminance =
-            ( normal.x * globalLight.x ) +
-            ( normal.y * globalLight.y ) +
-            ( normal.z * globalLight.z );
+        if( normal.dotProduct(cameraRay) < 0 ){
+
+          const luminance = normal.dotProduct(globalLight)
 
           const color = parseInt(255*luminance)
 
@@ -179,9 +174,10 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
 
 
           // Scale into view
-          projectedTriangle.vertices[0].x += 1.0; projectedTriangle.vertices[0].y += 1.0;
-          projectedTriangle.vertices[1].x += 1.0; projectedTriangle.vertices[1].y += 1.0;
-          projectedTriangle.vertices[2].x += 1.0; projectedTriangle.vertices[2].y += 1.0;
+          const offsetView = new Vector4(1,1,0)
+          projectedTriangle.vertices[0] = projectedTriangle.vertices[0].add(offsetView)
+          projectedTriangle.vertices[1] = projectedTriangle.vertices[1].add(offsetView)
+          projectedTriangle.vertices[2] = projectedTriangle.vertices[2].add(offsetView)
 
           projectedTriangle.vertices[0].x *= 0.5 * screen.width;
           projectedTriangle.vertices[0].y *= 0.5 * screen.height;
@@ -228,10 +224,7 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
           // screen.canvas.stroke();
         })
 
-      window.requestAnimationFrame(rotateCube);
+      window.requestAnimationFrame(window.rotateCube);
     }
 
-    window.requestAnimationFrame(rotateCube);
-
-  })
-})(window)
+    window.requestAnimationFrame(window.rotateCube);
