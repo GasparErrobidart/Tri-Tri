@@ -1,12 +1,14 @@
-import Mesh from './Mesh'
+import Mesh     from './Mesh'
+import Triangle from './Triangle'
+import Vertex   from './Vertex'
 
 class Cube extends Mesh{
 
-  constructor(options = {}){
+  constructor(options : any = {}){
 
     const { size = 1.0 } = options
 
-    let triangles = [
+    let triangles : Triangle[] = [
 
       // SOUTH
   		new Triangle(

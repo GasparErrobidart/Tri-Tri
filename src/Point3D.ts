@@ -1,14 +1,18 @@
 class Point3D{
 
-  constructor(options = {}){
+  x : Number;
+  y : Number;
+  z : Number;
 
-    if(Array.isArray(options)){
-      let [x=0, y=0, z=0] = options;
+  constructor(cordinates : any = {}){
+
+    if(Array.isArray(cordinates)){
+      let [x=0, y=0, z=0] = cordinates;
       this.x = x;
       this.y = y;
       this.z = z;
     }else{
-      let {x=0, y=0, z=0} = options;
+      let {x=0, y=0, z=0} = cordinates;
       this.x = x;
       this.y = y;
       this.z = z;

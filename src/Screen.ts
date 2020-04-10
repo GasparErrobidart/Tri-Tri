@@ -1,3 +1,6 @@
+import ProjectionMatrix from './ProjectionMatrix'
+import Point3D from './Point3D'
+
 class Screen{
 
   constructor(options){
