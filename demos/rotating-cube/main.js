@@ -6,8 +6,17 @@
     // c.width    = rect.width
     // c.height   = rect.height
 
-
+    const globalLight = new Point3D({z : -1.0})
+    const globalLightLength = Math.sqrt(
+      globalLight.x**2+
+      globalLight.y**2+
+      globalLight.z**2
+    )
+    globalLight.x /= globalLightLength
+    globalLight.y /= globalLightLength
+    globalLight.z /= globalLightLength
     let screen = new Screen({selector : "#screen"})
+
 
     console.log(screen)
 
@@ -15,7 +24,7 @@
     let previous  = null
     let theta     = 0
 
-    screen.canvas.strokeStyle = "white";
+    screen.canvas.strokeStyle = "blue";
     screen.add(cube)
 
     function rotateCube(timestamp){
@@ -98,41 +107,89 @@
                 translatedVertex = new Vertex();
                 translatedVertex.x = vertex.x
                 translatedVertex.y = vertex.y
-                translatedVertex.z = vertex.z + 20
+                translatedVertex.z = vertex.z + 3
                 return translatedVertex
               }
             )
           }
         )
 
-        projectedTriangle = new Triangle(
-          {
-            vertices : translatedTriangle.vertices.map(
-              vertex => MultiplyMatrixVector(vertex, screen.projectionMatrix.matrix)
-            )
-          }
-        )
+
+        const
+          normal  = new Point3D(),
+          line1   = new Point3D(),
+          line2   = new Point3D();
+
+        line1.x   = translatedTriangle.vertices[1].x - translatedTriangle.vertices[0].x;
+        line1.y   = translatedTriangle.vertices[1].y - translatedTriangle.vertices[0].y;
+        line1.z   = translatedTriangle.vertices[1].z - translatedTriangle.vertices[0].z;
+
+        line2.x   = translatedTriangle.vertices[2].x - translatedTriangle.vertices[0].x;
+        line2.y   = translatedTriangle.vertices[2].y - translatedTriangle.vertices[0].y;
+        line2.z   = translatedTriangle.vertices[2].z - translatedTriangle.vertices[0].z;
+
+        normal.x  = (line1.y * line2.z) - (line1.z * line2.y)
+        normal.y  = (line1.z * line2.x) - (line1.x * line2.z)
+        normal.z  = (line1.x * line2.y) - (line1.y * line2.x)
+
+        const length = Math.sqrt(normal.x**2 + normal.y**2 + normal.z**2)
+        normal.x /= length
+        normal.y /= length
+        normal.z /= length
+
+        if(
+          normal.x * (translatedTriangle.vertices[0].x - screen.camera.x) +
+          normal.y * (translatedTriangle.vertices[0].y - screen.camera.y) +
+          normal.z * (translatedTriangle.vertices[0].z - screen.camera.z)
+          < 0
+        ){
+
+          const luminance =
+            ( normal.x * globalLight.x ) +
+            ( normal.y * globalLight.y ) +
+            ( normal.z * globalLight.z );
+
+          const color = parseInt(255*luminance)
+
+          projectedTriangle = new Triangle(
+            {
+              vertices : translatedTriangle.vertices.map(
+                vertex => MultiplyMatrixVector(vertex, screen.projectionMatrix.matrix)
+              )
+            }
+          )
 
 
 
-        // Scale into view
-        projectedTriangle.vertices[0].x += 1.0; projectedTriangle.vertices[0].y += 1.0;
-        projectedTriangle.vertices[1].x += 1.0; projectedTriangle.vertices[1].y += 1.0;
-        projectedTriangle.vertices[2].x += 1.0; projectedTriangle.vertices[2].y += 1.0;
-        projectedTriangle.vertices[0].x *= 0.5 * screen.width;
-        projectedTriangle.vertices[0].y *= 0.5 * screen.height;
-        projectedTriangle.vertices[1].x *= 0.5 * screen.width;
-        projectedTriangle.vertices[1].y *= 0.5 * screen.height;
-        projectedTriangle.vertices[2].x *= 0.5 * screen.width;
-        projectedTriangle.vertices[2].y *= 0.5 * screen.height;
+          // Scale into view
+          projectedTriangle.vertices[0].x += 1.0; projectedTriangle.vertices[0].y += 1.0;
+          projectedTriangle.vertices[1].x += 1.0; projectedTriangle.vertices[1].y += 1.0;
+          projectedTriangle.vertices[2].x += 1.0; projectedTriangle.vertices[2].y += 1.0;
 
+          projectedTriangle.vertices[0].x *= 0.5 * screen.width;
+          projectedTriangle.vertices[0].y *= 0.5 * screen.height;
+          projectedTriangle.vertices[1].x *= 0.5 * screen.width;
+          projectedTriangle.vertices[1].y *= 0.5 * screen.height;
+          projectedTriangle.vertices[2].x *= 0.5 * screen.width;
+          projectedTriangle.vertices[2].y *= 0.5 * screen.height;
 
+          screen.canvas.beginPath();
+          screen.canvas.moveTo(projectedTriangle.vertices[0].x, projectedTriangle.vertices[0].y);
+          screen.canvas.fillStyle = `rgba(${color},${color},${color},1.0)`;
+          [1,2,0].forEach(
+            i => {
+              if(i == 0){
+                screen.canvas.closePath()
+              }else{
+                screen.canvas.lineTo(projectedTriangle.vertices[i].x, projectedTriangle.vertices[i].y)
+              }
+            }
+          )
+          screen.canvas.fill();
+          // screen.canvas.stroke();
 
-        screen.canvas.moveTo(projectedTriangle.vertices[0].x, projectedTriangle.vertices[0].y);
-        [1,2,0].forEach(
-          i => screen.canvas.lineTo(projectedTriangle.vertices[i].x, projectedTriangle.vertices[i].y)
-        )
-        screen.canvas.stroke();
+        }
+
 
 
       });
