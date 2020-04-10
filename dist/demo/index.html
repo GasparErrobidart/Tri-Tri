@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Tri Tri - Demo</title>
+  <style>
+    html,body,canvas{
+      padding:0;
+      margin:0;
+      width:100%;
+      height: 100%;
+      font-family: sans-serif;
+    }
+
+
+    .UI-layer{
+      color: white;
+      position: fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height: 100%;
+      padding:20px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div class="UI-layer">
+    <label>
+      <span>Model File</span>
+      <input type="file" id="model-file" name="model-file" accept=".obj">
+    </label>
+  </div>
+  <canvas id="screen"></canvas>
+  <script src="main.js"></script>
+<script src="main.js"></script></body>
+</html>
