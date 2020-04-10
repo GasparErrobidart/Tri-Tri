@@ -18,14 +18,6 @@ class ProjectionMatrix extends Matrix{
     this.near         = near
     this.far          = far
 
-    // Projection Matrix
-    this.values = [
-      [0,0,0,0],
-      [0,0,0,0],
-      [0,0,0,0],
-      [0,0,0,0]
-    ]
-
     this.update()
 
   }

@@ -4,13 +4,14 @@ import {
   Mesh,
   Vector4,
   Screen,
-  Matrix
+  Matrix,
+  ZRotationMatrix,
+  XRotationMatrix,
+  TranslationMatrix
 } from '../index'
 
 import MultiplyMatrixVector from '../helpers/MultiplyMatrixVector'
 
-
-// console.log(multiply([0,1,2], [[2,2,0],[3,3,0],[3,3,1]]))
 
 window.addEventListener("keydown",function(evt){
   switch(evt.key){
@@ -104,118 +105,50 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
 
 
       // Set up rotation matrices
-    	let matRotZ = [
-        [0,0,0,0],
-        [0,0,0,0],
-        [0,0,0,0],
-        [0,0,0,0]
-      ]
-      , matRotX = [
-        [0,0,0,0],
-        [0,0,0,0],
-        [0,0,0,0],
-        [0,0,0,0]
-      ];
+    	let matRotZ  = new ZRotationMatrix({ angleRad : theta * 0.5 });
+      let matRotX  = new XRotationMatrix({ angleRad : theta });
+      let matTrans = new TranslationMatrix({ x : 0, y : 0, z : 8 });
+      let matWorld = matRotZ.multiplyMatrix(matRotX).multiplyMatrix(matTrans);
+
+
+
     	theta += 0.001 * elapsedTime;
 
-    	// Rotation Z
-    	matRotZ[0][0] = Math.cos(theta);
-    	matRotZ[0][1] = Math.sin(theta);
-    	matRotZ[1][0] = -Math.sin(theta);
-    	matRotZ[1][1] = Math.cos(theta);
-    	matRotZ[2][2] = 1;
-    	matRotZ[3][3] = 1;
 
-      // Rotation X
-    	matRotX[0][0] = 1;
-    	matRotX[1][1] = Math.cos(theta * 0.5);
-    	matRotX[1][2] = Math.sin(theta * 0.5);
-    	matRotX[2][1] = -Math.sin(theta * 0.5);
-    	matRotX[2][2] = Math.cos(theta * 0.5);
-    	matRotX[3][3] = 1;
 
       let trianglesToRaster = cube.triangles.map( triangle => {
 
 
 
         let
-        projectedTriangle : Triangle,
-        translatedTriangle : Triangle,
-        zRotatedTriangle : Triangle,
-        zxRotatedTriangle : Triangle;
+        projectedTriangle   : Triangle,
+        transformedTriangle  : Triangle;
 
-        zRotatedTriangle = new Triangle(
+
+
+
+
+        transformedTriangle = new Triangle(
           {
             vertices : triangle.vertices.map(
-              vertex =>{
-                // Rotate in Z-Axis
-                return  MultiplyMatrixVector(vertex, matRotZ)
-              }
-            )
-          }
-        )
-
-        zxRotatedTriangle = new Triangle(
-          {
-            vertices : zRotatedTriangle.vertices.map(
-              vertex =>{
-                // Rotate in Z-Axis
-                return MultiplyMatrixVector(vertex, matRotX)
-              }
+              vertex => matWorld.multiplyVector(vertex)
             )
           }
         )
 
 
+    		// Get lines either side of triangle
+    		let line1 = transformedTriangle.vertices[1].substract(transformedTriangle.vertices[0])
+    		let line2 = transformedTriangle.vertices[2].substract(transformedTriangle.vertices[0])
 
-
-        translatedTriangle = new Triangle(
-          {
-            vertices : zxRotatedTriangle.vertices.map(
-              vertex =>{
-                let translatedVertex = new Vector4();
-                translatedVertex.x = vertex.x;
-                translatedVertex.y = vertex.y;
-                translatedVertex.z = vertex.z + 8;
-                return translatedVertex
-              }
-            )
-          }
-        )
-
-
-        const
-          normal  = new Vector4(0,0,0,1),
-          line1   = new Vector4(0,0,0,1),
-          line2   = new Vector4(0,0,0,1);
-
-
-
-        line1.x   = translatedTriangle.vertices[1].x - translatedTriangle.vertices[0].x;
-        line1.y   = translatedTriangle.vertices[1].y - translatedTriangle.vertices[0].y;
-        line1.z   = translatedTriangle.vertices[1].z - translatedTriangle.vertices[0].z;
-
-        line2.x   = translatedTriangle.vertices[2].x - translatedTriangle.vertices[0].x;
-        line2.y   = translatedTriangle.vertices[2].y - translatedTriangle.vertices[0].y;
-        line2.z   = translatedTriangle.vertices[2].z - translatedTriangle.vertices[0].z;
-
-        normal.x  = (line1.y * line2.z) - (line1.z * line2.y)
-        normal.y  = (line1.z * line2.x) - (line1.x * line2.z)
-        normal.z  = (line1.x * line2.y) - (line1.y * line2.x)
-
-
-        const length = Math.sqrt( normal.x**2 + normal.y**2 + normal.z**2 );
-        normal.x = normal.x / length;
-        normal.y = normal.y / length;
-        normal.z = normal.z / length;
-
-
+    		// Take cross product of lines to get normal to triangle surface
+    		let normal = line1.crossProduct(line2).normalised()
 
 
         if(
-          normal.x * (translatedTriangle.vertices[0].x - screen.camera.x) +
-          normal.y * (translatedTriangle.vertices[0].y - screen.camera.y) +
-          normal.z * (translatedTriangle.vertices[0].z - screen.camera.z)
+          normal.x * (transformedTriangle.vertices[0].x - screen.camera.x) +
+          normal.y * (transformedTriangle.vertices[0].y - screen.camera.y) +
+          normal.z * (transformedTriangle.vertices[0].z - screen.camera.z)
           < 0
         ){
 
@@ -229,22 +162,16 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
 
           projectedTriangle = new Triangle(
             {
-              vertices : translatedTriangle.vertices.map(
+              vertices : transformedTriangle.vertices.map(
                 vertex =>{
                   const result = screen.projectionMatrix.multiplyVector(vertex)
-                  if(result.w != 0){
-                    result.x /= result.w
-                    result.y /= result.w
-                    result.z /= result.w
-                  }
-                  return result
+                  return result.divide(result.w)
                 }
 
               )
             }
           )
 
-          // console.log(projectedTriangle)
 
 
           projectedTriangle.color = `rgba(${color},${color},${color},1.0)`;

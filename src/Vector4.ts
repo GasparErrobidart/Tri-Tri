@@ -54,6 +54,46 @@ class Vector4{
     return this.values
   }
 
+  divide(k : Number) : Vector4{
+    if(k != 0){
+    	return new Vector4( this.x / k, this.y / k, this.z / k);
+    }
+  }
+
+  multiply(k : Number) : Vector4{
+    if(k != 0){
+    	return new Vector4( this.x * k, this.y * k, this.z * k);
+    }
+  }
+
+  dotProduct(vector : Vector4) : Number{
+  	return this.x*vector.x + this.y*vector.y + this.z * vector.z;
+  }
+
+  length() : Number {
+  	return Math.sqrt( this.dotProduct(this) );
+  }
+
+  normalised() : Vector4{
+    return this.divide( this.length() )
+  }
+
+  crossProduct(vector : Vector4) : Vector4{
+  	const result = new Vector4()
+  	result.x = this.y * vector.z - this.z * vector.y;
+  	result.y = this.z * vector.x - this.x * vector.z;
+  	result.z = this.x * vector.y - this.y * vector.x;
+  	return result;
+  }
+
+  add(vector : Vector4) : Vector4{
+  	return new Vector4( this.x + vector.x, this.y + vector.y, this.z + vector.z );
+  }
+
+  substract(vector : Vector4) : Vector4{
+  	return new Vector4( this.x - vector.x, this.y - vector.y, this.z - vector.z );
+  }
+
 }
 
 export default Vector4
