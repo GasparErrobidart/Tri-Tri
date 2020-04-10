@@ -279,13 +279,10 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
           screen.canvas.beginPath();
           screen.canvas.moveTo(projectedTriangle.vertices[0].x, projectedTriangle.vertices[0].y);
           screen.canvas.fillStyle = projectedTriangle.color;
-          screen.canvas.strokeStyle = projectedTriangle.color;
-          screen.canvas.lineWidth = 1.5;
           [1,2,0].forEach(
             i => {
               if(i == 0){
                 screen.canvas.fill()
-                screen.canvas.stroke();
               }else{
                 screen.canvas.lineTo(projectedTriangle.vertices[i].x, projectedTriangle.vertices[i].y)
               }
