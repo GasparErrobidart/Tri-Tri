@@ -49,7 +49,7 @@ function loadNewObject(data : any){
 
   triangles = triangles.map( (triangle : any) => {
     let v = triangle
-      .map( (i : any) => new Vertex(vertices[i-1]) )
+      .map( (i : any) => new Vertex(...vertices[i-1]) )
     return new Triangle({ vertices : v })
   })
 
@@ -206,7 +206,7 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
         normal.z  = (line1.x * line2.y) - (line1.y * line2.x)
 
 
-        const length = ( (normal.x**2) + (normal.y**2) + (normal.z**2) )**2;
+        const length = Math.sqrt( normal.x**2 + normal.y**2 + normal.z**2 );
         normal.x = normal.x / length;
         normal.y = normal.y / length;
         normal.z = normal.z / length;
@@ -279,10 +279,13 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
           screen.canvas.beginPath();
           screen.canvas.moveTo(projectedTriangle.vertices[0].x, projectedTriangle.vertices[0].y);
           screen.canvas.fillStyle = projectedTriangle.color;
+          screen.canvas.strokeStyle = projectedTriangle.color;
+          screen.canvas.lineWidth = 1.5;
           [1,2,0].forEach(
             i => {
               if(i == 0){
                 screen.canvas.fill()
+                screen.canvas.stroke();
               }else{
                 screen.canvas.lineTo(projectedTriangle.vertices[i].x, projectedTriangle.vertices[i].y)
               }
