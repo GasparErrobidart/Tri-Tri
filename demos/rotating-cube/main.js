@@ -1,3 +1,25 @@
+let cube    = new Cube({size : 1.0})
+
+function loadNewObject(data){
+  const lines    = data.split("\n")
+  const vertices = lines
+    .filter( l => /^v/i.test(l) )
+    .map( l => l.replace(/^v\s/i,'').split(' '))
+  let triangles = lines
+    .filter( l => /^f/i.test(l) )
+    .map( l => l.replace(/^f\s/i,'').split(' '))
+
+  triangles = triangles.map( triangle => {
+    let v = triangle
+      .map( i => new Vertex(vertices[i-1]) )
+    return new Triangle({ vertices : v })
+  })
+
+  cube = new Mesh({ triangles })
+
+
+}
+
 (function(window){
   window.addEventListener('load',function(){
     // const c    = document.getElementById("screen")
@@ -20,7 +42,6 @@
 
     console.log(screen)
 
-    const cube    = new Cube({size : 1.0})
     let previous  = null
     let theta     = 0
 
@@ -67,7 +88,7 @@
     	matRotX[2][2] = Math.cos(theta * 0.5);
     	matRotX[3][3] = 1;
 
-      cube.triangles.forEach( triangle => {
+      let trianglesToRaster = cube.triangles.map( triangle => {
 
 
         let
@@ -107,7 +128,7 @@
                 translatedVertex = new Vertex();
                 translatedVertex.x = vertex.x
                 translatedVertex.y = vertex.y
-                translatedVertex.z = vertex.z + 3
+                translatedVertex.z = vertex.z + 8
                 return translatedVertex
               }
             )
@@ -151,6 +172,7 @@
 
           const color = parseInt(255*luminance)
 
+
           projectedTriangle = new Triangle(
             {
               vertices : translatedTriangle.vertices.map(
@@ -158,6 +180,9 @@
               )
             }
           )
+
+
+          projectedTriangle.color = `rgba(${color},${color},${color},1.0)`;
 
 
 
@@ -173,26 +198,45 @@
           projectedTriangle.vertices[2].x *= 0.5 * screen.width;
           projectedTriangle.vertices[2].y *= 0.5 * screen.height;
 
+
+
+          return projectedTriangle;
+        }
+
+        return null;
+
+
+
+
+      });
+
+
+      trianglesToRaster
+        .filter( t => t )
+        .sort( (t1,t2) => {
+          let z1 = (t1.vertices[0].z + t1.vertices[1].z + t1.vertices[2].z) / 3.0;
+    			let z2 = (t2.vertices[0].z + t2.vertices[1].z + t2.vertices[2].z) / 3.0;
+    			return z2 - z1;
+        } )
+        .forEach( projectedTriangle =>{
           screen.canvas.beginPath();
           screen.canvas.moveTo(projectedTriangle.vertices[0].x, projectedTriangle.vertices[0].y);
-          screen.canvas.fillStyle = `rgba(${color},${color},${color},1.0)`;
+          screen.canvas.fillStyle = projectedTriangle.color;
+          screen.canvas.strokeStyle = projectedTriangle.color;
+          screen.canvas.lineWidth = 1.5;
           [1,2,0].forEach(
             i => {
               if(i == 0){
-                screen.canvas.closePath()
+                screen.canvas.fill()
+                screen.canvas.stroke();
               }else{
                 screen.canvas.lineTo(projectedTriangle.vertices[i].x, projectedTriangle.vertices[i].y)
               }
             }
           )
-          screen.canvas.fill();
           // screen.canvas.stroke();
+        })
 
-        }
-
-
-
-      });
       window.requestAnimationFrame(rotateCube);
     }
 
