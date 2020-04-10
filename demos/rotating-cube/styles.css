@@ -3,17 +3,4 @@ html,body,canvas{
   margin:0;
   width:100%;
   height: 100%;
-  font-family: sans-serif;
 }
-/* 
-.UI-layer{
-  color: white;
-  position: fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height: 100%;
-  padding:20px;
-  box-sizing: border-box;
-  background: rgba(255,0,0,0.2);
-} */

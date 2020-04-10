@@ -8,17 +8,7 @@
   <title>Document</title>
 </head>
 <body>
-  <!-- <div class="UI-layer">
-    <label>
-      <span>Model File</span>
-      <input type="file" id="model-file" name="model-file" accept=".obj">
-    </label>
-
-
-  </div> -->
-  <canvas id="screen">
-
-  </canvas>
+  <canvas id="screen"></canvas>
   <script src="../../node_modules/mathjs/dist/math.js"></script>
   <script src="../../lib/helpers/MultiplyMatrixVector.js"></script>
   <script src="../../lib/Screen.js"></script>
@@ -29,19 +19,5 @@
   <script src="../../lib/Mesh.js"></script>
   <script src="../../lib/Cube.js"></script>
   <script src="main.js"></script>
-
-  <!-- <script>
-    function handleFileSelect(evt) {
-      const file     = evt.target.files[0] // FileList object
-      const reader   = new FileReader()
-      reader.onload  = function(evt) {
-        const data = evt.target.result;
-        loadNewObject(data)
-      };
-      reader.readAsBinaryString(file);
-    }
-
-    document.getElementById('model-file').addEventListener('change', handleFileSelect, false);
-  </script> -->
 </body>
 </html>
