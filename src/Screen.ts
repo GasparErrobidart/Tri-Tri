@@ -1,5 +1,5 @@
 import ProjectionMatrix from './ProjectionMatrix'
-import Point3D from './Point3D'
+import Vector4 from './Vector4'
 
 class Screen{
 
@@ -20,7 +20,7 @@ class Screen{
     })
     this.canvasDOM.width  = this.width
     this.canvasDOM.height = this.height
-    this.camera           = new Point3D()
+    this.camera           = new Vector4()
   }
 
   get width(){

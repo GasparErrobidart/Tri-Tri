@@ -1,8 +1,13 @@
-import Point3D from './Point3D'
+import Vector4 from './Vector4'
 
-class Vertex extends Point3D{
-  constructor(options = {}){
-    super(options)
+class Vertex extends Vector4{
+  constructor(
+    x : Number | undefined,
+    y : Number | undefined,
+    z : Number | undefined,
+    w : Number | undefined
+  ){
+    super(x,y,z,w)
   }
 }
 

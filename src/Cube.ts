@@ -4,7 +4,7 @@ import Vertex   from './Vertex'
 
 class Cube extends Mesh{
 
-  constructor(options : any = {}){
+  constructor(options : any = {} ){
 
     const { size = 1.0 } = options
 
@@ -14,18 +14,18 @@ class Cube extends Mesh{
   		new Triangle(
         {
           vertices : [
-            new Vertex({x: 0.0, y:0.0, z : 0.0}),
-            new Vertex({x: 0.0, y:size,z :  0.0}),
-            new Vertex({x: size, y:size,z :  0.0})
+            new Vertex(0.0, 0.0,  0.0),
+            new Vertex(0.0, size,  0.0),
+            new Vertex(size, size,  0.0)
           ]
         }
       ),
       new Triangle(
         {
           vertices : [
-            new Vertex({x: 0.0, y:0.0, z : 0.0}),
-            new Vertex({x: size, y:size,z :  0.0}),
-            new Vertex({x: size, y:0.0, z : 0.0})
+            new Vertex(0.0, 0.0,  0.0),
+            new Vertex(size, size,  0.0),
+            new Vertex(size, 0.0,  0.0)
           ]
         }
       ),
@@ -34,18 +34,18 @@ class Cube extends Mesh{
       new Triangle(
         {
           vertices : [
-            new Vertex({x: size, y:0.0, z : 0.0}),
-            new Vertex({x: size, y:size,z :  0.0}),
-            new Vertex({x: size, y:size,z :  size})
+            new Vertex(size, 0.0,  0.0),
+            new Vertex(size, size,  0.0),
+            new Vertex(size, size,  size)
           ]
         }
       ),
       new Triangle(
         {
           vertices : [
-            new Vertex({x: size, y:0.0, z : 0.0}),
-            new Vertex({x: size, y:size,z :  size}),
-            new Vertex({x: size, y:0.0, z : size })
+            new Vertex(size, 0.0,  0.0),
+            new Vertex(size, size,  size),
+            new Vertex(size, 0.0,  size )
           ]
         }
       ),
@@ -54,18 +54,18 @@ class Cube extends Mesh{
       new Triangle(
         {
           vertices : [
-            new Vertex({x: size, y:0.0, z : size}),
-            new Vertex({x: size, y:size,z :  size}),
-            new Vertex({x: 0.0, y:size,z :  size })
+            new Vertex(size, 0.0,  size),
+            new Vertex(size, size,  size),
+            new Vertex(0.0, size,  size )
           ]
         }
       ),
       new Triangle(
         {
           vertices : [
-            new Vertex({x: size, y:0.0, z : size}),
-            new Vertex({x: 0.0, y:size,z :  size}),
-            new Vertex({x: 0.0, y:0.0, z : size })
+            new Vertex(size, 0.0,  size),
+            new Vertex(0.0, size,  size),
+            new Vertex(0.0, 0.0,  size )
           ]
         }
       ),
@@ -75,18 +75,18 @@ class Cube extends Mesh{
       new Triangle(
         {
           vertices : [
-            new Vertex({x: 0.0, y:0.0, z : size}),
-            new Vertex({x: 0.0, y:size,z :  size}),
-            new Vertex({x: 0.0, y:size,z :  0.0 })
+            new Vertex(0.0, 0.0,  size),
+            new Vertex(0.0, size,  size),
+            new Vertex(0.0, size,  0.0 )
           ]
         }
       ),
       new Triangle(
         {
           vertices : [
-            new Vertex({x: 0.0, y:0.0, z : size}),
-            new Vertex({x: 0.0, y:size,z :  0.0}),
-            new Vertex({x: 0.0, y:0.0, z : 0.0 })
+            new Vertex(0.0, 0.0,  size),
+            new Vertex(0.0, size,  0.0),
+            new Vertex(0.0, 0.0,  0.0 )
           ]
         }
       ),
@@ -95,18 +95,18 @@ class Cube extends Mesh{
       new Triangle(
         {
           vertices : [
-            new Vertex({x: 0.0, y:size,z :  0.0}),
-            new Vertex({x: 0.0, y:size,z :  size}),
-            new Vertex({x: size, y:size,z :  size })
+            new Vertex(0.0, size,  0.0),
+            new Vertex(0.0, size,  size),
+            new Vertex(size, size,  size )
           ]
         }
       ),
       new Triangle(
         {
           vertices : [
-            new Vertex({x: 0.0, y:size,z :  0.0}),
-            new Vertex({x: size, y:size,z :  size}),
-            new Vertex({x: size, y:size,z :  0.0 })
+            new Vertex(0.0, size,  0.0),
+            new Vertex(size, size,  size),
+            new Vertex(size, size,  0.0 )
           ]
         }
       ),
@@ -115,18 +115,18 @@ class Cube extends Mesh{
       new Triangle(
         {
           vertices : [
-            new Vertex({x: size, y:0.0, z : size}),
-            new Vertex({x: 0.0, y:0.0, z : size}),
-            new Vertex({x: 0.0, y:0.0, z : 0.0 })
+            new Vertex(size, 0.0,  size),
+            new Vertex(0.0, 0.0,  size),
+            new Vertex(0.0, 0.0,  0.0 )
           ]
         }
       ),
       new Triangle(
         {
           vertices : [
-            new Vertex({x: size, y:0.0, z : size}),
-            new Vertex({x: 0.0, y:0.0, z : 0.0}),
-            new Vertex({x: size, y:0.0, z : 0.0 })
+            new Vertex(size, 0.0,  size),
+            new Vertex(0.0, 0.0,  0.0),
+            new Vertex(size, 0.0,  0.0 )
           ]
         }
       )

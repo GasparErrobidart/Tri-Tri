@@ -40,6 +40,7 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.9.5",
     "@babel/preset-env": "^7.9.5",
     "@babel/preset-typescript": "^7.9.0",
+    "@types/mathjs": "^6.0.5",
     "babel-loader": "^8.1.0",
     "html-webpack-plugin": "^4.2.0",
     "tslint": "^6.1.1",

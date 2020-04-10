@@ -3,11 +3,38 @@ import {
   Vertex,
   Triangle,
   Mesh,
-  Point3D,
+  Vector4,
   Screen
 } from '../index'
 
+import { multiply } from 'mathjs'
+
 import MultiplyMatrixVector from '../helpers/MultiplyMatrixVector'
+
+
+// console.log(multiply([0,1,2], [[2,2,0],[3,3,0],[3,3,1]]))
+
+window.addEventListener("keydown",function(evt){
+  switch(evt.key){
+    case "a":
+      break;
+    case "d":
+      break;
+    case "w":
+      break;
+    case "s":
+      break;
+    case "ArrowLeft":
+      break;
+    case "ArrowRight":
+      break;
+    case "ArrowUp":
+      break;
+    case "ArrowDown":
+      break;
+  }
+})
+
 
 let cube : Cube = new Cube({size : 1.0})
 
@@ -45,13 +72,9 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
 
 (function(window){
   window.addEventListener('load',function(){
-    // const c    = document.getElementById("screen")
-    // const ctx  = c.getContext("2d")
-    // const rect = c.getBoundingClientRect()
-    // c.width    = rect.width
-    // c.height   = rect.height
 
-    const globalLight = new Point3D({z : -1.0})
+    const globalLight = new Vector4()
+    globalLight.z     = -1.0
     const globalLightLength = Math.sqrt(
       globalLight.x**2+
       globalLight.y**2+
@@ -60,10 +83,11 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
     globalLight.x /= globalLightLength
     globalLight.y /= globalLightLength
     globalLight.z /= globalLightLength
+
     let screen = new Screen({selector : "#screen"})
 
 
-    console.log(screen)
+    // console.log(screen)
 
     let previous  = null
     let theta     = 0
@@ -72,6 +96,7 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
     screen.add(cube)
 
     function rotateCube(timestamp){
+      // console.log("Rotating cube")
 
       screen.fill("black")
 
@@ -114,6 +139,7 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
       let trianglesToRaster = cube.triangles.map( triangle => {
 
 
+
         let
         projectedTriangle : Triangle,
         translatedTriangle : Triangle,
@@ -125,7 +151,7 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
             vertices : triangle.vertices.map(
               vertex =>{
                 // Rotate in Z-Axis
-                return MultiplyMatrixVector(vertex, matRotZ)
+                return  MultiplyMatrixVector(vertex, matRotZ)
               }
             )
           }
@@ -141,6 +167,7 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
             )
           }
         )
+
 
 
 
@@ -160,9 +187,11 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
 
 
         const
-          normal  = new Point3D(),
-          line1   = new Point3D(),
-          line2   = new Point3D();
+          normal  = new Vector4(0,0,0,1),
+          line1   = new Vector4(0,0,0,1),
+          line2   = new Vector4(0,0,0,1);
+
+
 
         line1.x   = translatedTriangle.vertices[1].x - translatedTriangle.vertices[0].x;
         line1.y   = translatedTriangle.vertices[1].y - translatedTriangle.vertices[0].y;
@@ -176,10 +205,14 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
         normal.y  = (line1.z * line2.x) - (line1.x * line2.z)
         normal.z  = (line1.x * line2.y) - (line1.y * line2.x)
 
-        const length = Math.sqrt(normal.x**2 + normal.y**2 + normal.z**2)
-        normal.x /= length
-        normal.y /= length
-        normal.z /= length
+
+        const length = ( (normal.x**2) + (normal.y**2) + (normal.z**2) )**2;
+        normal.x = normal.x / length;
+        normal.y = normal.y / length;
+        normal.z = normal.z / length;
+
+
+
 
         if(
           normal.x * (translatedTriangle.vertices[0].x - screen.camera.x) +
@@ -232,6 +265,7 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
 
 
       });
+
 
 
       trianglesToRaster

@@ -1,4 +1,4 @@
-import Point3D            from './Point3D'
+import Vector4            from './Vector4'
 import Vertex             from './Vertex'
 import Triangle           from './Triangle'
 import Mesh               from './Mesh'
@@ -7,11 +7,11 @@ import ProjectionMatrix   from './ProjectionMatrix'
 import Screen             from './Screen'
 
 export {
-  Point3D,
+  Vector4,
   Vertex,
   Triangle,
   Mesh,
   Cube,
   ProjectionMatrix,
   Screen
-}  
+}
