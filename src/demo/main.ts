@@ -1,13 +1,11 @@
 import {
   Cube,
-  Vertex,
   Triangle,
   Mesh,
   Vector4,
-  Screen
+  Screen,
+  Matrix
 } from '../index'
-
-import { multiply } from 'mathjs'
 
 import MultiplyMatrixVector from '../helpers/MultiplyMatrixVector'
 
@@ -49,7 +47,7 @@ function loadNewObject(data : any){
 
   triangles = triangles.map( (triangle : any) => {
     let v = triangle
-      .map( (i : any) => new Vertex(...vertices[i-1]) )
+      .map( (i : any) => new Vector4(...vertices[i-1]) )
     return new Triangle({ vertices : v })
   })
 
@@ -87,7 +85,7 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
     let screen = new Screen({selector : "#screen"})
 
 
-    // console.log(screen)
+    console.log(screen)
 
     let previous  = null
     let theta     = 0
@@ -175,10 +173,10 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
           {
             vertices : zxRotatedTriangle.vertices.map(
               vertex =>{
-                let translatedVertex = new Vertex();
-                translatedVertex.x = vertex.x
-                translatedVertex.y = vertex.y
-                translatedVertex.z = vertex.z + 8
+                let translatedVertex = new Vector4();
+                translatedVertex.x = vertex.x;
+                translatedVertex.y = vertex.y;
+                translatedVertex.z = vertex.z + 8;
                 return translatedVertex
               }
             )
@@ -232,10 +230,21 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
           projectedTriangle = new Triangle(
             {
               vertices : translatedTriangle.vertices.map(
-                vertex => MultiplyMatrixVector(vertex, screen.projectionMatrix.matrix)
+                vertex =>{
+                  const result = screen.projectionMatrix.multiplyVector(vertex)
+                  if(result.w != 0){
+                    result.x /= result.w
+                    result.y /= result.w
+                    result.z /= result.w
+                  }
+                  return result
+                }
+
               )
             }
           )
+
+          // console.log(projectedTriangle)
 
 
           projectedTriangle.color = `rgba(${color},${color},${color},1.0)`;
@@ -279,13 +288,11 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
           screen.canvas.beginPath();
           screen.canvas.moveTo(projectedTriangle.vertices[0].x, projectedTriangle.vertices[0].y);
           screen.canvas.fillStyle = projectedTriangle.color;
-          screen.canvas.strokeStyle = projectedTriangle.color;
-          screen.canvas.lineWidth = 1.5;
+
           [1,2,0].forEach(
             i => {
               if(i == 0){
                 screen.canvas.fill()
-                screen.canvas.stroke();
               }else{
                 screen.canvas.lineTo(projectedTriangle.vertices[i].x, projectedTriangle.vertices[i].y)
               }

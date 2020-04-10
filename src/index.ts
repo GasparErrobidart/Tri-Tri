@@ -1,5 +1,5 @@
 import Vector4            from './Vector4'
-import Vertex             from './Vertex'
+import Matrix            from './Matrix'
 import Triangle           from './Triangle'
 import Mesh               from './Mesh'
 import Cube               from './Cube'
@@ -8,7 +8,7 @@ import Screen             from './Screen'
 
 export {
   Vector4,
-  Vertex,
+  Matrix,
   Triangle,
   Mesh,
   Cube,

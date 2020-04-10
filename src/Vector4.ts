@@ -1,6 +1,6 @@
 class Vector4{
 
-  values : Number[] = [0.0,0.0,0.0,1.0];
+  values : Number[] = [0,0,0,1]
 
   constructor(
     x : Number | undefined,
@@ -11,7 +11,7 @@ class Vector4{
     this.set(x,y,z,w)
   }
 
-  set( x : Number = 0.0, y : Number = 0.0, z : Number = 0.0, w : Number = 1.0 ){
+  set( x : Number = 0, y : Number =0, z : Number =0, w : Number =1 ){
     this.values[0] = x
     this.values[1] = y
     this.values[2] = z

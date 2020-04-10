@@ -1,7 +1,7 @@
-import Vertex from '../Vertex'
+import Vector4 from '../Vector4'
 
 export default function MultiplyMatrixVector(inputVertex, matrix){
-  let output = new Vertex();
+  let output = new Vector4();
 	output.x = inputVertex.x * matrix[0][0] + inputVertex.y * matrix[1][0] + inputVertex.z * matrix[2][0] + matrix[3][0];
 	output.y = inputVertex.x * matrix[0][1] + inputVertex.y * matrix[1][1] + inputVertex.z * matrix[2][1] + matrix[3][1];
 	output.z = inputVertex.x * matrix[0][2] + inputVertex.y * matrix[1][2] + inputVertex.z * matrix[2][2] + matrix[3][2];

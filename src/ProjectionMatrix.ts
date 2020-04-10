@@ -1,6 +1,9 @@
-class ProjectionMatrix{
+import Matrix from './Matrix'
+
+class ProjectionMatrix extends Matrix{
 
   constructor(options){
+    super(options)
     const {
       width,
       height,
@@ -16,7 +19,7 @@ class ProjectionMatrix{
     this.far          = far
 
     // Projection Matrix
-    this.matrix = [
+    this.values = [
       [0,0,0,0],
       [0,0,0,0],
       [0,0,0,0],
@@ -30,16 +33,13 @@ class ProjectionMatrix{
   update(){
     const
     aspectRatio = this.height / this.width,
-    fovRad = 1.0 / Math.tan(
-      this.fieldOfView * 0.5 / 180.0 * 3.14159
-    )
-
-    this.matrix[0][0] = aspectRatio * fovRad;
-    this.matrix[1][1] = fovRad;
-    this.matrix[2][2] = this.far / (this.far - this.near);
-    this.matrix[3][2] = (-this.far * this.near) / (this.far - this.near);
-    this.matrix[2][3] = 1.0;
-    this.matrix[3][3] = 0.0;
+    fovRad = 1.0 / Math.tan( this.fieldOfView * 0.5 / 180.0 * 3.14159 )
+    this.values[0][0] = aspectRatio * fovRad;
+    this.values[1][1] = fovRad;
+    this.values[2][2] = this.far / (this.far - this.near);
+    this.values[3][2] = (-this.far * this.near) / (this.far - this.near);
+    this.values[2][3] = 1.0;
+    this.values[3][3] = 0.0;
   }
 
 }
