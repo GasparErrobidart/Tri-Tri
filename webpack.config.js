@@ -1,30 +1,39 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
 module.exports = {
-entry: './src/js/index.js',
-output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'js/bundle.js'
-},
-devServer: {
-    contentBase: './dist'
-},
-plugins: [
-    new HtmlWebpackPlugin({
-       filename: 'index.html',
-       template: './src/index.html'
-    })
-],
-module: {
+
+  // webpack will take the files from ./src/index
+  entry: './src/index',
+
+  // and output it into /dist as bundle.js
+  output: {
+    path: path.join(__dirname, '/dist'),
+    filename: 'tri-tri.js'
+  },
+
+  // adding .ts and .tsx to resolve.extensions will help babel look for .ts and .tsx files to transpile
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js']
+  },
+
+  module: {
     rules: [
-        {
-            test: /\.js$/, //using regex to tell babel exactly what files to transcompile
-            exclude: /node_modules/, // files to be ignored
-            use: {
-                loader: 'babel-loader' // specify the loader
-            }
-        }
+
+        // we use babel-loader to load our jsx and tsx files
+      {
+        test: /\.(ts|js)x?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader'
+        },
+      }
+
+
     ]
-}
-}
+  },
+  plugins: [
+    // new HtmlWebpackPlugin({
+    //   template: './src/index.html'
+    // })
+  ]
+};

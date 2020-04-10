@@ -1,3 +1,5 @@
+import Mesh from './Mesh'
+
 class Cube extends Mesh{
 
   constructor(options = {}){
@@ -133,3 +135,5 @@ class Cube extends Mesh{
   }
 
 }
+
+export default Cube

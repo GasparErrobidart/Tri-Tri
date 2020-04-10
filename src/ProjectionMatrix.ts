@@ -43,3 +43,5 @@ class ProjectionMatrix{
   }
 
 }
+
+export default ProjectionMatrix

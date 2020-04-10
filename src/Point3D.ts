@@ -21,3 +21,5 @@ class Point3D{
   }
 
 }
+
+export default Point3D

@@ -11,3 +11,5 @@ class Mesh{
   }
 
 }
+
+export default Mesh
