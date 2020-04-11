@@ -70,8 +70,10 @@ class Triangle {
 
 			// Copy appearance info to new triangle
       const newTriangle = new Triangle()
-      newTriangle.color = `rgba(0,0,${parseInt(255*this.luminance)},1.0)`
+      let color = `rgba(${parseInt(255*this.luminance)},${parseInt(255*this.luminance)},${parseInt(255*this.luminance)},1.0)`
+      // newTriangle.color = `rgba(0,0,${parseInt(255*this.luminance)},1.0)`
       newTriangle.luminance = this.luminance
+      newTriangle.color = color
 			// The inside point is valid, so keep that...
 			newTriangle.vertices[0] = insidePoints[0];
 
@@ -90,10 +92,14 @@ class Triangle {
 
       const newTriangle1 = new Triangle()
       const newTriangle2 = new Triangle()
-      newTriangle1.color = `rgba(${parseInt(255*this.luminance)},0,0,1.0)`
+      let color = `rgba(${parseInt(255*this.luminance)},${parseInt(255*this.luminance)},${parseInt(255*this.luminance)},1.0)`
+      // newTriangle1.color = `rgba(${parseInt(255*this.luminance)},0,0,1.0)`
       newTriangle1.luminance = this.luminance
-      newTriangle2.color = `rgba(0,${parseInt(255*this.luminance)},0,1.0)`
+      // newTriangle2.color = `rgba(0,${parseInt(255*this.luminance)},0,1.0)`
       newTriangle2.luminance = this.luminance
+
+      newTriangle1.color = color
+      newTriangle2.color = color
 
 			// The first triangle consists of the two inside points and a new
 			// point determined by the location where one side of the triangle

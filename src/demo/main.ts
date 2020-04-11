@@ -29,16 +29,16 @@ window.addEventListener("keydown",function(evt){
     //   screen.camera.x -= 2 * elapsedTime;
     //   break;
     case "w":
-      screen.camera.y += 2 * elapsedTime;
+      screen.camera.y += 8 * elapsedTime;
       break;
     case "s":
-      screen.camera.y -= 2 * elapsedTime;
+      screen.camera.y -= 8 * elapsedTime;
       break;
     case "ArrowLeft":
-      yaw-= 2 * elapsedTime
+      yaw-= 4 * elapsedTime
       break;
     case "ArrowRight":
-      yaw+= 2 * elapsedTime
+      yaw+= 4 * elapsedTime
       break;
     case "ArrowUp":
 
@@ -122,7 +122,7 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
       // Set up rotation matrices
     	let matRotZ  = new ZRotationMatrix({ angleRad : theta * 0.5 });
       let matRotX  = new XRotationMatrix({ angleRad : theta });
-      let matTrans = new TranslationMatrix({ x : 0, y : 0, z : 6 });
+      let matTrans = new TranslationMatrix({ x : 0, y : 0, z : 2 });
       let matWorld = matRotZ.multiplyMatrix(matRotX).multiplyMatrix(matTrans);
 
       let upVector = new Vector4(0,1,0)
@@ -320,11 +320,14 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
             screen.canvas.beginPath();
             screen.canvas.moveTo(triangle.vertices[0].x, triangle.vertices[0].y);
             screen.canvas.fillStyle = triangle.color;
+            screen.canvas.strokeStyle = triangle.color;
+            screen.canvas.lineWidth = 1.5;
 
             [1,2,0].forEach(
               i => {
                 if(i == 0){
                   screen.canvas.fill()
+                  screen.canvas.stroke();
                 }else{
                   screen.canvas.lineTo(triangle.vertices[i].x, triangle.vertices[i].y)
                 }
