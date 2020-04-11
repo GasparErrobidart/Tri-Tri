@@ -98,6 +98,17 @@ class Vector4{
   	return new Vector4( this.x - vector.x, this.y - vector.y, this.z - vector.z );
   }
 
+  intersectPlane(planeNormal : Vector4, lineStart : Vector4, lineEnd : Vector4){
+		planeNormal = planeNormal.normalised()
+		const plane_d = -planeNormal.dotProduct(this);
+	  const ad = lineStart.dotProduct(planeNormal);
+	  const bd = lineEnd.dotProduct(planeNormal);
+	  const t = (-plane_d - ad) / (bd - ad);
+		const lineStartToEnd = lineEnd.substract(lineStart);
+		const lineToIntersect = lineStartToEnd.multiply(t);
+		return lineStart.add(lineToIntersect);
+	}
+
 }
 
 export default Vector4

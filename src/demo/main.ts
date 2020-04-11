@@ -5,6 +5,7 @@ import {
   Vector4,
   Screen,
   Matrix,
+  IdentityMatrix,
   ZRotationMatrix,
   YRotationMatrix,
   XRotationMatrix,
@@ -16,33 +17,36 @@ import {
 let screen = new Screen({selector : "#screen"})
 let mainObject : Mesh = new Cube({size : 1.0})
 let yaw = 0
+let elapsedTime = 0
 
 window.addEventListener("keydown",function(evt){
-  let forwardVector = screen.lookDirection.multiply(0.2)
+  let forwardVector = screen.lookDirectionVector.multiply( 8  * elapsedTime)
   switch(evt.key){
-    case "a":
-      screen.camera.x -= 0.2;
-      break;
-    case "d":
-      screen.camera.x += 0.2;
-      break;
+    // case "a":
+    //   screen.camera.x += 2 * elapsedTime;
+    //   break;
+    // case "d":
+    //   screen.camera.x -= 2 * elapsedTime;
+    //   break;
     case "w":
-      screen.camera = screen.camera.add(forwardVector)
+      screen.camera.y += 2 * elapsedTime;
       break;
     case "s":
-      screen.camera = screen.camera.substract(forwardVector)
+      screen.camera.y -= 2 * elapsedTime;
       break;
     case "ArrowLeft":
-      yaw-=0.1
+      yaw-= 2 * elapsedTime
       break;
     case "ArrowRight":
-      yaw+=0.1
+      yaw+= 2 * elapsedTime
       break;
     case "ArrowUp":
-      screen.camera.y -= 0.2;
+
+      screen.camera = screen.camera.add(forwardVector)
       break;
     case "ArrowDown":
-      screen.camera.y += 0.2;
+
+      screen.camera = screen.camera.substract(forwardVector)
       break;
   }
 })
@@ -84,8 +88,7 @@ function handleFileSelect(evt : any) {
 document.getElementById('model-file').addEventListener('change', handleFileSelect, false);
 
 
-    const globalLight = new Vector4()
-    globalLight.z     = -1.0
+    const globalLight = new Vector4(-1,1,-1)
     const globalLightLength = Math.sqrt(
       globalLight.x**2+
       globalLight.y**2+
@@ -112,22 +115,21 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
       screen.fill("black")
 
       if (!previous) previous = timestamp;
-      var elapsedTime = timestamp - previous;
+      elapsedTime = (timestamp - previous) / 1000;
       previous = timestamp
 
 
       // Set up rotation matrices
     	let matRotZ  = new ZRotationMatrix({ angleRad : theta * 0.5 });
       let matRotX  = new XRotationMatrix({ angleRad : theta });
-      let matTrans = new TranslationMatrix({ x : 0, y : 0, z : 4 });
+      let matTrans = new TranslationMatrix({ x : 0, y : 0, z : 6 });
       let matWorld = matRotZ.multiplyMatrix(matRotX).multiplyMatrix(matTrans);
 
-      let upVector = new Vector4(0,1,0);
-      // let targetVector = screen.camera.add(screen.lookDirection)
+      let upVector = new Vector4(0,1,0)
       let targetVector = new Vector4(0,0,1)
       let matCameraRot = new YRotationMatrix({ angleRad : yaw })
-      let lookDirectionVector = matCameraRot.multiplyVector(targetVector)
-      targetVector = screen.camera.add(lookDirectionVector)
+      screen.lookDirectionVector = matCameraRot.multiplyVector(targetVector)
+      targetVector = screen.camera.add(screen.lookDirectionVector)
 
 
       let matCamera = new PointAtMatrix({
@@ -144,12 +146,14 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
 
 
 
-      let trianglesToRaster = mainObject.triangles.map( triangle => {
+      let trianglesToRaster = []
+
+      mainObject.triangles.forEach( triangle => {
 
 
 
         let
-        projectedTriangle     : Triangle,
+        projectedTriangles     : Triangle,
         transformedTriangle   : Triangle,
         viewedTriangle          : Triangle;
 
@@ -182,6 +186,8 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
 
           const color = parseInt(255*luminance)
 
+
+          // World Space -> View Space
           viewedTriangle = new Triangle(
             {
               vertices : transformedTriangle.vertices.map(
@@ -191,43 +197,63 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
           )
 
 
-          projectedTriangle = new Triangle(
-            {
-              vertices : viewedTriangle.vertices.map(
-                vertex =>{
-                  const result = screen.projectionMatrix.multiplyVector(vertex)
-                  return result.divide(result.w)
-                }
 
-              )
-            }
+          const clippedTriangles = viewedTriangle.clipAgainstPlane(
+            new Vector4(0,0,screen.projectionMatrix.near),
+            new Vector4(0,0,1)
           )
 
+          // console.log("clipped",clippedTriangles)
+          // From 3D -> 2D
+          projectedTriangles = clippedTriangles.map((clippedTriangle,i) =>{
+            const projectedTriangle = new Triangle(
+              {
+                vertices : clippedTriangle.vertices.map(
+                  vertex =>{
+                    let result = screen.projectionMatrix.multiplyVector(vertex)
+                    result = result.divide(result.w)
+                    result.x *= -1
+                    result.y *= -1
+                    return result
+                  }
+
+                )
+              }
+            )
+
+            projectedTriangle.color = `rgba(${color},${color},${color},1.0)`
+            projectedTriangle.luminance = luminance
+            return projectedTriangle
+          })
 
 
-          projectedTriangle.color = `rgba(${color},${color},${color},1.0)`;
 
 
 
           // Scale into view
           const offsetView = new Vector4(1,1,0)
-          projectedTriangle.vertices[0] = projectedTriangle.vertices[0].add(offsetView)
-          projectedTriangle.vertices[1] = projectedTriangle.vertices[1].add(offsetView)
-          projectedTriangle.vertices[2] = projectedTriangle.vertices[2].add(offsetView)
+          projectedTriangles = projectedTriangles.map( projectedTriangle =>{
+            projectedTriangle.vertices[0] = projectedTriangle.vertices[0].add(offsetView)
+            projectedTriangle.vertices[1] = projectedTriangle.vertices[1].add(offsetView)
+            projectedTriangle.vertices[2] = projectedTriangle.vertices[2].add(offsetView)
 
-          projectedTriangle.vertices[0].x *= 0.5 * screen.width;
-          projectedTriangle.vertices[0].y *= 0.5 * screen.height;
-          projectedTriangle.vertices[1].x *= 0.5 * screen.width;
-          projectedTriangle.vertices[1].y *= 0.5 * screen.height;
-          projectedTriangle.vertices[2].x *= 0.5 * screen.width;
-          projectedTriangle.vertices[2].y *= 0.5 * screen.height;
+            projectedTriangle.vertices[0].x *= 0.5 * screen.width;
+            projectedTriangle.vertices[0].y *= 0.5 * screen.height;
+            projectedTriangle.vertices[1].x *= 0.5 * screen.width;
+            projectedTriangle.vertices[1].y *= 0.5 * screen.height;
+            projectedTriangle.vertices[2].x *= 0.5 * screen.width;
+            projectedTriangle.vertices[2].y *= 0.5 * screen.height;
+            return projectedTriangle
+          })
 
 
 
-          return projectedTriangle;
+
+          projectedTriangles.forEach( projectedTriangle => trianglesToRaster.push(projectedTriangle) )
+
+
         }
 
-        return null;
 
 
 
@@ -235,29 +261,78 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
       });
 
 
+      // console.log("Raster",trianglesToRaster)
 
       trianglesToRaster
-        .filter( t => t )
         .sort( (t1,t2) => {
           let z1 = (t1.vertices[0].z + t1.vertices[1].z + t1.vertices[2].z) / 3.0;
     			let z2 = (t2.vertices[0].z + t2.vertices[1].z + t2.vertices[2].z) / 3.0;
     			return z2 - z1;
         } )
         .forEach( projectedTriangle =>{
-          screen.canvas.beginPath();
-          screen.canvas.moveTo(projectedTriangle.vertices[0].x, projectedTriangle.vertices[0].y);
-          screen.canvas.fillStyle = projectedTriangle.color;
 
-          [1,2,0].forEach(
-            i => {
-              if(i == 0){
-                screen.canvas.fill()
-              }else{
-                screen.canvas.lineTo(projectedTriangle.vertices[i].x, projectedTriangle.vertices[i].y)
+
+          // Clip triangles against all four screen edges, this could yield
+    			// a bunch of triangles, so create a queue that we traverse to
+    			//  ensure we only test new triangles generated against planes
+          const triangles = [projectedTriangle];
+    			const clipped = [];
+
+    			// Add initial triangle
+    			let newTriangles = 1;
+
+    			for (let p = 0; p < 4; p++) {
+    				let trisToAdd = 0;
+    				while (newTriangles > 0) {
+    					// Take triangle from front of queue
+    					let test = triangles.pop();
+    					newTriangles--;
+
+    					// Clip it against a plane. We only need to test each
+    					// subsequent plane, against subsequent new triangles
+    					// as all triangles after a plane clip are guaranteed
+    					// to lie on the inside of the plane. I like how this
+    					// comment is almost completely and utterly justified
+
+    					switch (p)
+    					{
+    					case 0:	newTriangles = test.clipAgainstPlane(new Vector4( 0.0, 0.0, 0.0 ), new Vector4( 0.0, 1.0, 0.0 ) ); break;
+    					case 1:	newTriangles = test.clipAgainstPlane(new Vector4(0.0, screen.height - 1, 0.0 ), new Vector4( 0.0, -1.0, 0.0 ) ); break;
+    					case 2:	newTriangles = test.clipAgainstPlane(new Vector4( 0.0, 0.0, 0.0 ), new Vector4( 1.0, 0.0, 0.0 ) ); break;
+    					case 3:	newTriangles = test.clipAgainstPlane(new Vector4( screen.width - 1, 0.0, 0.0 ), new Vector4( -1.0, 0.0, 0.0 )); break;
+    					}
+              trisToAdd = newTriangles.length
+
+    					// Clipping may yield a variable number of triangles, so
+    					// add these new ones to the back of the queue for subsequent
+    					// clipping against next planes
+    					for (let w = 0; w < trisToAdd; w++){
+      					triangles.push(newTriangles[w]);
               }
-            }
-          )
-          // screen.canvas.stroke();
+    				}
+    				newTriangles = triangles.length;
+    			}
+
+
+
+          triangles.forEach( triangle =>{
+            //DRAW TRIANGLES
+            screen.canvas.beginPath();
+            screen.canvas.moveTo(triangle.vertices[0].x, triangle.vertices[0].y);
+            screen.canvas.fillStyle = triangle.color;
+
+            [1,2,0].forEach(
+              i => {
+                if(i == 0){
+                  screen.canvas.fill()
+                }else{
+                  screen.canvas.lineTo(triangle.vertices[i].x, triangle.vertices[i].y)
+                }
+              }
+            )
+            // screen.canvas.stroke();
+          })
+
         })
 
       window.requestAnimationFrame(window.rotateCube);
