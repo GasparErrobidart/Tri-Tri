@@ -6,35 +6,47 @@ import {
   Screen,
   Matrix,
   ZRotationMatrix,
+  YRotationMatrix,
   XRotationMatrix,
-  TranslationMatrix
+  TranslationMatrix,
+  PointAtMatrix
 } from '../index'
 
 
+let screen = new Screen({selector : "#screen"})
+let mainObject : Mesh = new Cube({size : 1.0})
+let yaw = 0
 
 window.addEventListener("keydown",function(evt){
+  let forwardVector = screen.lookDirection.multiply(0.2)
   switch(evt.key){
     case "a":
+      screen.camera.x -= 0.2;
       break;
     case "d":
+      screen.camera.x += 0.2;
       break;
     case "w":
+      screen.camera = screen.camera.add(forwardVector)
       break;
     case "s":
+      screen.camera = screen.camera.substract(forwardVector)
       break;
     case "ArrowLeft":
+      yaw-=0.1
       break;
     case "ArrowRight":
+      yaw+=0.1
       break;
     case "ArrowUp":
+      screen.camera.y -= 0.2;
       break;
     case "ArrowDown":
+      screen.camera.y += 0.2;
       break;
   }
 })
 
-
-let mainObject : Mesh = new Cube({size : 1.0})
 
 function loadNewObject(data : any){
   const lines    = data.split("\n")
@@ -83,7 +95,7 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
     globalLight.y /= globalLightLength
     globalLight.z /= globalLightLength
 
-    let screen = new Screen({selector : "#screen"})
+
 
 
     console.log(screen)
@@ -107,12 +119,28 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
       // Set up rotation matrices
     	let matRotZ  = new ZRotationMatrix({ angleRad : theta * 0.5 });
       let matRotX  = new XRotationMatrix({ angleRad : theta });
-      let matTrans = new TranslationMatrix({ x : 0, y : 0, z : 8 });
+      let matTrans = new TranslationMatrix({ x : 0, y : 0, z : 4 });
       let matWorld = matRotZ.multiplyMatrix(matRotX).multiplyMatrix(matTrans);
 
+      let upVector = new Vector4(0,1,0);
+      // let targetVector = screen.camera.add(screen.lookDirection)
+      let targetVector = new Vector4(0,0,1)
+      let matCameraRot = new YRotationMatrix({ angleRad : yaw })
+      let lookDirectionVector = matCameraRot.multiplyVector(targetVector)
+      targetVector = screen.camera.add(lookDirectionVector)
 
 
-    	theta += 0.001 * elapsedTime;
+      let matCamera = new PointAtMatrix({
+        position : screen.camera,
+        target : targetVector,
+        up : upVector
+      })
+
+      let matView = matCamera.inverse()
+
+
+
+    	// theta += 0.001 * elapsedTime;
 
 
 
@@ -121,11 +149,9 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
 
 
         let
-        projectedTriangle   : Triangle,
-        transformedTriangle  : Triangle;
-
-
-
+        projectedTriangle     : Triangle,
+        transformedTriangle   : Triangle,
+        viewedTriangle          : Triangle;
 
 
         transformedTriangle = new Triangle(
@@ -135,6 +161,8 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
             )
           }
         )
+
+
 
 
     		// Get lines either side of triangle
@@ -154,10 +182,18 @@ document.getElementById('model-file').addEventListener('change', handleFileSelec
 
           const color = parseInt(255*luminance)
 
+          viewedTriangle = new Triangle(
+            {
+              vertices : transformedTriangle.vertices.map(
+                vertex => matView.multiplyVector(vertex)
+              )
+            }
+          )
+
 
           projectedTriangle = new Triangle(
             {
-              vertices : transformedTriangle.vertices.map(
+              vertices : viewedTriangle.vertices.map(
                 vertex =>{
                   const result = screen.projectionMatrix.multiplyVector(vertex)
                   return result.divide(result.w)

@@ -11,6 +11,7 @@ import ZRotationMatrix    from './ZRotationMatrix'
 import TranslationMatrix  from './TranslationMatrix'
 import IdentityMatrix     from './IdentityMatrix'
 import ProjectionMatrix   from './ProjectionMatrix'
+import PointAtMatrix      from './PointAtMatrix'
 
 export {
   Vector4,
@@ -24,5 +25,6 @@ export {
   YRotationMatrix,
   ZRotationMatrix,
   TranslationMatrix,
-  IdentityMatrix
+  IdentityMatrix,
+  PointAtMatrix
 }

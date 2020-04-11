@@ -3,6 +3,8 @@ import Vector4 from './Vector4'
 
 class Screen{
 
+  camera : Vector4;
+
   constructor(options){
     const {
       selector,
@@ -21,6 +23,7 @@ class Screen{
     this.canvasDOM.width  = this.width
     this.canvasDOM.height = this.height
     this.camera           = new Vector4()
+    this.lookDirection    = new Vector4(0,0,1)
   }
 
   get width(){

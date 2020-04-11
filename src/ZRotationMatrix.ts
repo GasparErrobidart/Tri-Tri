@@ -3,7 +3,7 @@ import Matrix from './Matrix'
 class ZRotationMatrix extends Matrix{
 
   constructor(options = {}){
-    super(options)
+    super()
     const { angleRad = 0 } = options
   	this.values[0][0] = Math.cos(angleRad);
 		this.values[0][1] = Math.sin(angleRad);

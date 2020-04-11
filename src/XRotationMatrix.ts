@@ -3,7 +3,7 @@ import Matrix from './Matrix'
 class XRotationMatrix extends Matrix{
 
   constructor(options = {}){
-    super(options)
+    super()
     const { angleRad = 0 } = options
 		this.values[0][0] = 1.0
 		this.values[1][1] = Math.cos(angleRad)

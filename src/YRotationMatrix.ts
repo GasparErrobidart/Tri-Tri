@@ -3,7 +3,7 @@ import Matrix from './Matrix'
 class YRotationMatrix extends Matrix{
 
   constructor(options = {}){
-    super(options)
+    super()
     const { angleRad = 0 } = options
   	this.values[0][0] = Math.cos(angleRad);
 		this.values[0][2] = Math.sin(angleRad);

@@ -3,7 +3,7 @@ import Matrix from './Matrix'
 class TranslationMatrix extends Matrix{
 
   constructor(options = {}){
-    super(options)
+    super()
     const { x = 0, y = 0, z = 0 } = options
   	this.values[0][0] = 1.0
   	this.values[1][1] = 1.0
